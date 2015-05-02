@@ -28,7 +28,7 @@
   vertical-align: middle;
   line-height: 120px;
   background-color: rgba(135, 240, 234, 0.27);
-  transition:0.24s;
+  -webkit-animation-duration: 0.74s;
 }
 
 

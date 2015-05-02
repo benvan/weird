@@ -1,35 +1,98 @@
 <html>
-  <head>
-    <link rel="stylesheet" href="http://meyerweb.com/eric/tools/css/reset/reset.css"></link>
-    <link rel="stylesheet" href="animate.css">
-
-    <link rel="stylesheet" href="main.css"></link>
-
-    <script type="text/javascript" src="zepto.js"></script>
-    <style>
-      
-    </style>
-  </head>
-  <body>
-    <div class="question-container">
-      <div class="question">
-        <span class="question-text">Do you pee in the shower?</span>
-      </div>
-      <ul class="answers">
-        <li>No</li>
-        <li>Yes</li>
-      </div>
-    <div>
-
-    <script>
-      $(document).ready(function(){
+    <head>
+        <link rel="stylesheet" href="http://meyerweb.com/eric/tools/css/reset/reset.css">
+        <link rel="stylesheet" href="animate.css">
+        <link rel="stylesheet" href="main.css">
         
-        $('.question').addClass('animated').addClass('fadeIn');
-        setTimeout(function(){
-        $('.question').addClass('animated').addClass('bounce');  
-        })
-      });
-    </script>
+        <script type="text/javascript" src="zepto.js"></script>
+        <script type="text/javascript" src="q.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.8.0/lodash.js"></script>
+        <script type="text/javascript" src="tinycolor.js"></script>
+        <script type="text/javascript" src="anims.js"></script>
+      
+        <script id="question" type="template">
+            <div class="question-container" style="background-color:{{color}}">
+                <div class="question animated fadeIn">
+                    <span class="question-text animated {{anim}}">{{question}}</span>
+                </div>
+                <ul class="answers">{{answers}}</ul>    
+            </div>
+        </script>
+    
+    </head>
+    <body>
+        <div id="all">
+            <div class="question-container" style="background-color:rgb(226, 94, 255)">
+                <div class="question animated fadeIn">
+                    <span class="question-text animated rollIn">How many showers per week?</span>
+                </div>
+                <ul class="answers">
+                    <li class="animated rollIn">7</li>
+                    <li class="animated rollIn">7+</li>
+                    <li class="animated rollIn">5-6</li>
+                    <li class="animated rollIn">3-4</li>
+                    <li class="animated rollIn">1-2</li>
+                    <li class="animated rollIn">Never</li>
+                </ul>
+            </div>
+        <div>
 
-  </body>
+        <script>
+            
+            var request = function(url){
+                var d = Q.defer();
+                $.getJSON(url, d.resolve);
+                return d.promise;
+            };
+
+            var random = function(arr){
+                return arr[Math.floor(Math.random()*arr.length)]
+            };
+            
+            var tpl = function(name,obj){
+                return Object.keys(obj).reduce(function(cur,k){
+                    return cur.replace('{{' + k + '}}',obj[k]);
+                },document.getElementById(name).innerHTML)
+            };
+            
+            var nextColor = function(color){
+                var offset = Math.random()*75;
+                return tinycolor(color).spin(offset).toRgbString();
+            };
+            
+            var nextQuestion = function(prev){
+                return request('/next').then(function(q){
+                    return _.extend({
+                        color: prev && nextColor(prev.color) || 'rgb(94, 94, 255)',
+                        anim: random(ins)    
+                    },q)
+                });
+            };
+            
+            var renderQuestion = function(q){
+                return tpl('question', _.extend({
+                    answers : renderOptions(q.options)
+                },q));
+            };
+            
+            var renderOptions = function(opts){
+                return opts.map(function(t){ return '<li class="animated rollIn">'+t+'</li>'}).join('')
+            };
+            
+            var last;
+            var container = $('#all');
+            var run = function(){
+                nextQuestion(last).then(function(q){
+                    container.html(renderQuestion(q));
+                    last = q;
+                }).done();
+            };
+        
+            $(document).ready(function(){
+//                run();
+                $(document).click(run);
+            });
+        </script>
+
+    </body>
 </html>
