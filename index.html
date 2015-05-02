@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="http://meyerweb.com/eric/tools/css/reset/reset.css"></link>
+    <link rel="stylesheet" href="animate.css">
+
+    <link rel="stylesheet" href="main.css"></link>
+
+    <script type="text/javascript" src="zepto.js"></script>
+    <style>
+      
+    </style>
+  </head>
+  <body>
+    <div class="question-container">
+      <div class="question">
+        <span class="question-text">Do you pee in the shower?</span>
+      </div>
+      <ul class="answers">
+        <li>No</li>
+        <li>Yes</li>
+      </div>
+    <div>
+
+    <script>
+      $(document).ready(function(){
+        
+        $('.question').addClass('animated').addClass('fadeIn');
+        setTimeout(function(){
+        $('.question').addClass('animated').addClass('bounce');  
+        })
+      });
+    </script>
+
+  </body>
+</html>
