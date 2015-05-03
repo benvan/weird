@@ -1,5 +1,7 @@
 <html>
+
     <head>
+        <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />        
         <link rel="stylesheet" href="http://meyerweb.com/eric/tools/css/reset/reset.css">
         <link rel="stylesheet" href="animate.css">
         <link rel="stylesheet" href="main.css">
@@ -15,9 +17,115 @@
                 <div class="question animated fadeIn">
                     <span class="question-text animated {{anim}}">{{question}}</span>
                 </div>
-                <ul class="answers">{{answers}}</ul>    
+                <ul class="answers {{big}}">{{answers}}</ul>    
             </div>
         </script>
+        
+        <style>
+            
+            @-webkit-keyframes TEST1 {
+                0%   {
+                    transform: translateX(0px) rotateZ(0deg);
+                    transform-origin: 50% 50%;
+                }
+                70%{
+                    transform: translateX(-150px) rotateZ(0deg);
+                    transform-origin: calc(50% + 150px) 50%;
+                }
+                100% {
+                    transform: translateX(-150px) rotateZ(45deg);
+                    transform-origin: calc(50% + 150px) 50%;
+                }
+            }
+            @-webkit-keyframes TEST2 {
+                0%   {
+                    transform: translateX(0px) rotateZ(0deg);
+                    transform-origin: 50% 50%;
+                }
+                70%{
+                    transform: translateX(-150px) rotateZ(0deg);
+                    transform-origin: calc(50% + 150px) 50%;
+                }
+                100% {
+                    transform: translateX(-150px) rotateZ(-45deg);
+                    transform-origin: calc(50% + 150px) 50%;
+                }
+            }
+            @-webkit-keyframes TEST3 {
+                 0%   {
+                     transform: translateX(0px) rotateZ(0deg);
+                     transform-origin: 50% 50%;
+                 }
+                 70%{
+                     transform: translateX(150px) rotateZ(0deg);
+                     transform-origin: calc(50% - 150px) 50%;
+                 }
+                 100% {
+                     transform: translateX(150px) rotateZ(45deg);
+                     transform-origin: calc(50% - 150px) 50%;
+                 }
+             }
+            @-webkit-keyframes TEST4 {
+                0%   {
+                    transform: translateX(0px) rotateZ(0deg);
+                    transform-origin: 50% 50%;
+                }
+                70%{
+                    transform: translateX(150px) rotateZ(0deg);
+                    transform-origin: calc(50% - 150px) 50%;
+                }
+                100% {
+                    transform: translateX(150px) rotateZ(-45deg);
+                    transform-origin: calc(50% - 150px) 50%;
+                }
+            }
+            .answers2{
+                text-align: center;
+                width: 480px;
+                height: 480px;
+                position: relative;
+            }
+            .answers2 li{
+                font-size: 22pt;
+                width: 100px;
+                /* display:inline-block; */
+                border-radius:50%;
+                border:3px solid white;
+                height: 100px;
+                /* margin: 5px 18px; */
+                /* text-align: center; */
+                /* vertical-align: middle; */
+                line-height: 100px;
+                background-color: rgba(135, 240, 234, 0.27);
+                -webkit-animation-duration: 0.74s;
+                position: absolute;
+                top: calc(50% - (100px/2));
+                left: calc(50% - (100px/2));
+                transform: translateX(0px) rotateZ(0deg);
+                transform-origin: 50% 50%;
+                transition:1s;
+            }
+            .answers2.on li.p1{
+                -webkit-animation: TEST1 1s;
+                transform: translateX(-150px) rotateZ(45deg);
+                transform-origin: calc(50% + 150px) 50%;
+            }
+            .answers2.on li.p2{
+                -webkit-animation: TEST2 1s;
+                transform: translateX(-150px) rotateZ(-45deg);
+                transform-origin: calc(50% + 150px) 50%;
+            }
+            .answers2.on li.p3{
+                -webkit-animation: TEST3 1s;
+                transform: translateX(150px) rotateZ(45deg);
+                transform-origin: calc(50% - 150px) 50%;
+            }
+            .answers2.on li.p4{
+                -webkit-animation: TEST4 1s;
+                transform: translateX(150px) rotateZ(-45deg);
+                transform-origin: calc(50% - 150px) 50%;
+            }
+        </style>
     
     </head>
     <body>
@@ -26,13 +134,11 @@
                 <div class="question animated fadeIn">
                     <span class="question-text animated rollIn">How many showers per week?</span>
                 </div>
-                <ul class="answers">
-                    <li class="animated rollIn">7</li>
-                    <li class="animated rollIn">7+</li>
-                    <li class="animated rollIn">5-6</li>
-                    <li class="animated rollIn">3-4</li>
-                    <li class="animated rollIn">1-2</li>
-                    <li class="animated rollIn">Never</li>
+                <ul class="answers2">
+                    <li class="p1">yes</li>
+                    <li class="p2">no</li>
+                    <li class="p3">no</li>
+                    <li class="p4">no</li>
                 </ul>
             </div>
         <div>
@@ -55,9 +161,23 @@
                 },document.getElementById(name).innerHTML)
             };
             
+            var deluminate = function(tc){
+                if(tc.getLuminance() > 0.7) {
+                    console.log("DESATURATE!");
+                    return tc.desaturate(15).spin(Math.random() > 0.5 ? 20 : -20);
+                } else {
+                    return tc;
+                }
+            };
+            
             var nextColor = function(color){
                 var offset = Math.random()*75;
-                return tinycolor(color).spin(offset).toRgbString();
+                var tc = tinycolor(color)
+                        .saturate(100)
+                        .spin(offset);
+                var processed = deluminate(tc);
+                console.log(processed.getLuminance());
+                return processed.toRgbString();
             };
             
             var nextQuestion = function(prev){
@@ -71,12 +191,41 @@
             
             var renderQuestion = function(q){
                 return tpl('question', _.extend({
-                    answers : renderOptions(q.options)
+                    answers : renderOptions(q.options),
+                    big : q.options.length < 4 ? "big" : ""
                 },q));
             };
             
             var renderOptions = function(opts){
-                return opts.map(function(t){ return '<li class="animated rollIn">'+t+'</li>'}).join('')
+                return circles(opts);
+//                return opts.map(function(t){ return '<li class="animated '+random(ins)+'">'+t+'</li>'}).join('')
+            };
+            
+            var yesno = /yes|no/i;
+            var isText = function(value){
+                return value.length > 3 || value.match(yesno) ;
+            };
+            var circles = function(opts){
+                
+                var count = opts.length;
+                var step = 180 / (count-1);
+                var width = opts.length == 2 ? 120 : 150;
+                return opts.reduce(function(acc,cur){
+                    acc.opts.push(
+                            $('<li></li>')
+                                    .css({
+                                        "transform": "translateX("+width+"px) rotateZ("+-acc.angle+"deg)",
+                                        "transform-origin": "-"+width+"px 0px"
+                                    }).append(
+                                        $('<div></div>').addClass("animated " + random(ins)).append(
+                                                $('<div></div>').append(cur).css({
+                                                    "transform": "rotateZ("+acc.angle+"deg)"
+                                                }).addClass( isText(cur) && "text"  )
+                                        )
+                                    ).prop('outerHTML'));
+                    acc.angle += step;
+                    return acc;
+                },{opts:[],angle:0}).opts.join('');
             };
             
             var last;
@@ -90,6 +239,7 @@
         
             $(document).ready(function(){
 //                run();
+                $('.answers2').addClass('on');
                 $(document).click(run);
             });
         </script>
