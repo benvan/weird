@@ -1,7 +1,7 @@
 <html>
 
     <head>
-        <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />        
+        <meta name="viewport" content="width=device-width; initial-scale=1.0;  minimum-scale=1.0">
         <link rel="stylesheet" href="http://meyerweb.com/eric/tools/css/reset/reset.css">
         <link rel="stylesheet" href="animate.css">
         <link rel="stylesheet" href="main.css">
@@ -238,10 +238,15 @@
             };
         
             $(document).ready(function(){
-//                run();
-                $('.answers2').addClass('on');
-                $(document).click(run);
+                setTimeout(window.scrollTo.bind(window,0,1),0);
+                run();
+                var args = ('ontouchstart' in document.documentElement) ? "touchstart" : "mousedown";
+                $( document ).on( args, "li div", function(){
+                    $(this).parent().prop('class','animated poof');
+                    setTimeout(run,300);
+                });
             });
+
         </script>
 
     </body>

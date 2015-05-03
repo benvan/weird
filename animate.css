@@ -2731,6 +2731,45 @@ Copyright (c) 2015 Daniel Eden
   animation-name: zoomInUp;
 }
 
+@-webkit-keyframes poof {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+        -webkit-transform: scale3d(1.6, 1.6, 1.6);
+        transform: scale3d(1.6, 1.6, 1.6);
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes poof {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+        -webkit-transform: scale3d(1.6, 1.6, 1.6);
+        transform: scale3d(1.6, 1.6, 1.6);
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.poof {
+    -webkit-animation-name: poof;
+    animation-name: poof;
+    -webkit-animation-duration: .5s;
+    animation-duration: .5s;
+}
+
 @-webkit-keyframes zoomOut {
   0% {
     opacity: 1;
