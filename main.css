@@ -57,9 +57,12 @@ html,body,#all,.question-container{
     border: 3px solid white;
     text-align: center;
     line-height: 80px;
-    background-color: rgba(135, 240, 234, 0.27);
+    background-color: rgba(156, 172, 171, 0.27);
     margin-left: -43px;
     margin-top: -43px;
+}
+.dark .answers li > div{
+    background-color: rgba(135, 240, 234, 0.27);
 }
 .answers li div div.text{
     font-size:70%;

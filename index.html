@@ -13,7 +13,7 @@
         <script type="text/javascript" src="anims.js"></script>
       
         <script id="question" type="template">
-            <div class="question-container" style="background-color:{{color}}">
+            <div class="question-container {{tint}}" style="background-color:{{color}}">
                 <div class="question animated fadeIn">
                     <span class="question-text animated {{anim}}">{{question}}</span>
                 </div>
@@ -172,10 +172,16 @@
                 return processed.toRgbString();
             };
             
+            var isDark = function(color){
+                return tinycolor(color).getLuminance() < 0.4
+            };
+            
             var nextQuestion = function(prev){
                 return request('/next').then(function(q){
+                    var color = prev && nextColor(prev.color) || 'rgb(94, 94, 255)';
                     return _.extend({
-                        color: prev && nextColor(prev.color) || 'rgb(94, 94, 255)',
+                        color: color,
+                        tint: isDark(color) ? 'dark' : '',
                         anim: random(ins)    
                     },q)
                 });
