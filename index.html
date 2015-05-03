@@ -131,15 +131,7 @@
     <body>
         <div id="all">
             <div class="question-container" style="background-color:rgb(226, 94, 255)">
-                <div class="question animated fadeIn">
-                    <span class="question-text animated rollIn">How many showers per week?</span>
-                </div>
-                <ul class="answers2">
-                    <li class="p1">yes</li>
-                    <li class="p2">no</li>
-                    <li class="p3">no</li>
-                    <li class="p4">no</li>
-                </ul>
+                
             </div>
         <div>
 
@@ -197,19 +189,19 @@
             };
             
             var renderOptions = function(opts){
-                return circles(opts);
-//                return opts.map(function(t){ return '<li class="animated '+random(ins)+'">'+t+'</li>'}).join('')
+                var width = $(document).width() > 384 ? 300 : 250;
+                return circles(opts,width/2);
             };
             
             var yesno = /yes|no/i;
             var isText = function(value){
                 return value.length > 3 || value.match(yesno) ;
             };
-            var circles = function(opts){
+            var circles = function(opts, maxwidth){
                 
                 var count = opts.length;
                 var step = 180 / (count-1);
-                var width = opts.length == 2 ? 120 : 150;
+                var width = opts.length == 2 ? maxwidth*0.8 : maxwidth;
                 return opts.reduce(function(acc,cur){
                     acc.opts.push(
                             $('<li></li>')

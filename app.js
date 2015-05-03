@@ -20,7 +20,7 @@ var buildQuestions = function(){
       options:pieces.slice(1)
     };
   };
-  return lines.map(makeQuestion); 
+  return lines.map(makeQuestion).filter(function(x){ return x.question.length > 0}); 
 };
 
 var questions = buildQuestions();
