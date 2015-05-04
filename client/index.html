@@ -13,7 +13,7 @@
         <script type="text/javascript" src="anims.js"></script>
       
         <script id="question" type="template">
-            <div class="question-container {{tint}}" style="background-color:{{color}}">
+            <div class="question-container {{tint}}" data-question="{{id}}" style="background-color:{{color}}">
                 <div class="question animated fadeIn">
                     <span class="question-text animated {{anim}}">{{question}}</span>
                 </div>
@@ -136,6 +136,26 @@
         <div>
 
         <script>
+            var path = function(base,data){
+                return Object.keys(data).reduce(function(acc,key){
+                    var pathIdx = acc.value.indexOf(':'+key);
+                    return pathIdx == -1
+                            ? acc
+                            : {value:acc.value.replace(':'+key,data[key]),keys: _.omit(acc.keys,key)}
+                },{value:base,keys:data})
+            };
+            var query = function(data){
+                var str = Object.keys(data).reduce(function(acc,key){
+                    return acc.concat(key+'='+data[key]);
+                },[]).join('&');
+                return str && ('?'+str);
+            };
+            
+            var url = function(base,data){
+                var fullbase = path(base,data);
+                var qs = query(fullbase.keys);  
+                return fullbase.value + qs; 
+            };
             
             var post = function(url,data){
                 var d = Q.defer();
@@ -183,7 +203,7 @@
             };
             
             var nextQuestion = function(state){
-                return request('/next?utoken='+state.utoken+'&qtoken='+state.qtoken).then(function(q){
+                return request(url('/question/next',{utoken:state.utoken, qtoken:state.qtoken})).then(function(q){
                     var color = state.question && nextColor(state.question.color) || 'rgb(94, 94, 255)';
                     return _.extend({},q,{
                         color: color,
@@ -214,9 +234,10 @@
                 var count = opts.length;
                 var step = 180 / (count-1);
                 var width = opts.length == 2 ? maxwidth*0.8 : maxwidth;
-                return opts.reduce(function(acc,cur){
+                return opts.reduce(function(acc,cur,i){
                     acc.opts.push(
                             $('<li></li>')
+                                    .data('answer',i)
                                     .css({
                                         "transform": "translateX("+-width+"px) rotateZ("+acc.angle+"deg)",
                                         "transform-origin": width+"px 0px"
@@ -232,50 +253,58 @@
                 },{opts:[],angle:0}).opts.join('');
             };
 
-            var State = function(state){
-                this.state = state;
-                this.next = function(){
-                    return nextQuestion(state).then(function(q){
-                        return new State(_.extend({},state,{
+            var State = {
+                next : function(prev){
+                    return nextQuestion(prev).then(function(q){
+                        return _.extend({},prev,{
                             question: q,
                             qtoken: q.id
-                        }));
+                        });
                     });
-                }
-            };
-            State.initialise = function(){
-                var utoken = localStorage.getItem('utoken');
-                var qtoken = localStorage.getItem('qtoken');
-                return post('/subscriber?utoken=' + utoken).then(function(user) {
-                    localStorage.setItem('utoken', user.utoken);
-                    localStorage.setItem('qtoken', user.qtoken);
-                    return new State({
-                        user : user,
-                        utoken : user.utoken,
-                        qtoken : user.qtoken,
-                        question : null
+                },
+                initialise : function(){
+                    var utoken = localStorage.getItem('utoken');
+                    var qtoken = localStorage.getItem('qtoken');
+                    return post('/subscriber?utoken=' + utoken).then(function(user) {
+                        localStorage.setItem('utoken', user.utoken);
+                        localStorage.setItem('qtoken', user.qtoken);
+                        return {
+                            user : user,
+                            utoken : user.utoken,
+                            qtoken : user.qtoken,
+                            question : null
+                        };
                     });
-                });
+                }  
             };
             
             var container = $('#all');
-            var state = State.initialise();
+            var stateP = State.initialise();
             var run = function(delay){
-                state = state.then(function(s){
-                    return Q.all([s.next(), Q.delay(delay)]).then(function(results){
+                stateP = stateP.then(function(s){
+                    return Q.all([State.next(s), Q.delay(delay)]).then(function(results){
                         var next = results[0];
-                        container.html(renderQuestion(next.state.question));
+                        container.html(renderQuestion(next.question));
                         return next;
                     });
                 });
-                Q.done(state);
+                Q.done(stateP);
             };
             
             
             $(document).ready(function(){
                 run();
                 $( document ).on( ('ontouchstart' in document.documentElement) ? "touchstart" : "mousedown", "li div", function(){
-                    $(this).parent().prop('class','animated poof');
+                    var answer = $(this).parents('li').data('answer');
+                    var question = $(this).parents('.question-container').data('question');
+                    
+                    stateP.then(function(s){
+                        post( url('/question/:qid/result/:aid',{qid:question, aid:answer, utoken: s.utoken}));
+                    });
+                    
+                    var selected = $(this).parent();
+                    selected.prop('class','animated poof');
+                    $('.answers').find('li > div').not(selected).prop('class','animated fadeOut superfast');
                     container.find('.question').addClass('slideOutLeft fast');
                     run(300);
                 });

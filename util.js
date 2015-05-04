@@ -7,5 +7,10 @@ module.exports = {
   readLines: function(filename){
     var text = fs.readFileSync(filename).toString();
     return text.split('\n');
+  },
+  tpl: function(string,values){
+    return Object.keys(values).reduce(function(acc,key){
+      return acc.replace('{{'+key+'}}',values[key]);
+    },string);
   }
 };
