@@ -16,7 +16,7 @@ var buildQuestions = function(){
 var questions = buildQuestions();
 
 var next = function(utoken,qtoken){
-  var index = ((parseInt(qtoken)||-1)+1)%questions.length;
+  var index = ((parseInt(qtoken) + 1) || 0)%questions.length;
   return questions[index];
 };
 
