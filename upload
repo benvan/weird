@@ -1,0 +1,4 @@
+#!/bin/bash
+
+tar -czf weird.tar.gz .
+scp weird.tar.gz ben@178.62.89.133:projects/
