@@ -4,7 +4,7 @@ var Q = require('q');
 var fs = require('fs');
 
 app.use(require('express-promise')());
-app.use(express.static(__dirname));
+app.use(express.static(__dirname+'/client'));
 
 var random = function(arr){
   return arr[Math.floor(Math.random()*arr.length)]
