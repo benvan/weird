@@ -1,4 +1,5 @@
 var util = require('./util');
+var _ = require('lodash');
 
 var buildQuestions = function(){
   var lines = util.readLines('resources/questions');
@@ -10,7 +11,7 @@ var buildQuestions = function(){
       options:pieces.slice(1)
     };
   };
-  return lines.map(makeQuestion).filter(function(x){ return x.question.length > 0});
+  return _.shuffle(lines).map(makeQuestion).filter(function(x){ return x.question.length > 0});
 };
 
 var questions = buildQuestions();

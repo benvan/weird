@@ -260,9 +260,10 @@
             
             var container = $('#all');
             var state = State.initialise();
-            var run = function(){
+            var run = function(delay){
                 state = state.then(function(s){
-                    return s.next().then(function(next){
+                    return Q.all([s.next(), Q.delay(delay)]).then(function(results){
+                        var next = results[0];
                         container.html(renderQuestion(next.state.question));
                         return next;
                     });
@@ -275,7 +276,8 @@
                 run();
                 $( document ).on( ('ontouchstart' in document.documentElement) ? "touchstart" : "mousedown", "li div", function(){
                     $(this).parent().prop('class','animated poof');
-                    setTimeout(run,300);
+                    container.find('.question').addClass('slideOutLeft fast');
+                    run(300);
                 });
             });
 
